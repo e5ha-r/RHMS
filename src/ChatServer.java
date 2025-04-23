@@ -1,5 +1,25 @@
-public class ChatServer {
-    public void sendMessage(String from, String to, String message) {
-        System.out.println(from + " to " + to + ": " + message);
+import java.util.ArrayList;
+import java.util.List;
+
+public class ChatServer
+{
+
+    private List<String> Log;
+
+    public ChatServer()
+    {
+        Log = new ArrayList<>();
+    }
+
+    public void receiveMessage(String sender, String message)
+    {
+        String formatted = sender + ": " + message;
+        Log.add(formatted);
+        System.out.println(formatted);
+    }
+
+    public List<String> getLog()
+    {
+        return Log;
     }
 }

@@ -1,79 +1,62 @@
 import java.util.ArrayList;
 
+public class Patient extends User
+{
+  
+    private VitalsDatabase vitals;
+    private ArrayList<Appointment> appointments;
+    private MedicalHistory medicalHistory;
 
-public class Patient extends User{
-
-
-    private String assignedDoctoremail;
-    private String Address;
-    private String Gender;
-    private String EmergencyContact;
-    private String nearestHospitalEmail;
-
-
-
-    private boolean hasUploadedVitals;
-
-    public Patient(int patientID, String patientName, String email, String password, String assignedDoctoremail,
-                   String Address, String Gender, String EmergencyContact, String nearestHospitalEmail){
-        super(patientID , patientName , email , password);
-
-
-        this.assignedDoctoremail = assignedDoctoremail;
-        this.Address = Address;
-        this.Gender = Gender;
-        this.EmergencyContact = EmergencyContact;
-        this.nearestHospitalEmail = nearestHospitalEmail;
-        hasUploadedVitals = false;
+    // Constructor:
+    public Patient(String firstName, String lastName, String email, String phoneNumber, char gender, int age, String address)
+    {
+        super(firstName, lastName, email, phoneNumber, gender, age, address);
+        this.appointments = new ArrayList<>();
+        this.medicalHistory = new MedicalHistory();
+        this.vitals = new VitalsDatabase();
     }
 
-    /// /////////////////////////////////PRESS PANIC BUTTON/////////////////////////////
-    public void pressPanicButton(){
-        NotificationService.sendNotificationToDoctor(getUserId(),getAddress(),getUsername() , getAssignedDoctoremail());
-        NotificationService.sendNotificationToHospital(getAddress(), getUsername(), getAssignedDoctoremail());
-        NotificationService.sendNotificationToEmergencyContact(getAddress(), getUsername(), getEmergencyContact());
+    // Uploading  Vitals
+    public void uploadVitals(VitalSign vital)
+    {
+        vitals.addVitals(vital);
     }
-
-    /// /////////////////////////////VIDEO CALL///////////////////////////////////////
-    public void requestVideoCall(){
-        VideocallDAO.requestVideoCall(getUserId(),getAssignedDoctoremail());
-    }
-
-    public ArrayList<String> getLinkForApprovedVideoCall(){
-        ArrayList<String> linkForApprovedVideoCall = VideocallDAO.getApprovedVideoLinks(this.getUserId());
-        return linkForApprovedVideoCall;
+    public VitalsDatabase getVitals()
+    {
+        return vitals;
     }
 
 
-
-
-
-
-
-
-    /////////////////////////////////getters and setters//////////////////////////////////
-
-
-    public String getAssignedDoctoremail() {return assignedDoctoremail;}
-    public String getAddress() {return Address;}
-    public String getGender() {return Gender;}
-    public String getEmergencyContact() {return EmergencyContact;}
-    public String getNearestHospitalEmail() {return nearestHospitalEmail;}
-    public boolean getHasUploadedVitals() {return hasUploadedVitals;}
-
-
-    //Method for signIN
-    public static Patient getInstanceOfPateintAndValidatePassword(String patientEmail, String password) {
-        Patient patient = AdminDAO.authenticatePatient(patientEmail, password);
-        return patient;
+    public void scheduleAppointment(AppointmentManager manager, Appointment appointment)
+    {
+        manager.requestAppointment(appointment);
     }
 
-    //Method for SignUP
-    public static Patient signUpPatient(int patientID, String patientName, String email, String password, String assignedDoctoremail,
-                                        String Address, String Gender, String EmergencyContact, String nearestHospitalEmail){
-        Patient newPatient = new Patient(patientID, patientName, email, password, assignedDoctoremail,
-                Address, Gender, EmergencyContact, nearestHospitalEmail);
-        AdminDAO.addNewPatient(newPatient);
-        return newPatient;
+    // Retrieve Appointments:
+    public ArrayList<Appointment> getAppointments()
+    {
+        return appointments;
+    }
+
+    public void viewFeedback()
+    {
+        if(medicalHistory.getFeedbackRecords().isEmpty())
+        {
+            System.out.println("No feedback records found");
+        }
+        else
+        {
+            System.out.println("Feedback Records for " + this.getfirstName() + " " + this.getlastName() + " :");
+            for (Feedback feedback : medicalHistory.getFeedbackRecords())
+            {
+                System.out.println(feedback);
+                System.out.println("-----------------------------");
+            }
+        }
+    }
+
+    public MedicalHistory getMedicalHistory()
+    {
+        return medicalHistory;
     }
 }

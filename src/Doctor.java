@@ -1,70 +1,73 @@
 import java.util.ArrayList;
 
-public class Doctor extends User {
+public class Doctor extends User
+{
 
-    public Doctor( int doctorID, String doctorName, String email, String password) {
-        super(doctorID, doctorName, email, password);
-
-    }
-    //doctor wants to see patients
-    public ArrayList<Patient> getPatients() {
-        ArrayList<Patient> doctorsPatients = AdminDAO.doctorGetsPatients(this.getEmail());
-        return doctorsPatients;
-    }
-
-    //doctor wants to see a patients vitals
-    public ArrayList<Vitals> doctorGetsVitals(int PatientID) {
-        ArrayList<Vitals> patientVitals = VitalsDAO.getVitalsByPatientId(PatientID);
-        return patientVitals;
+    private ArrayList<Patient> patients;
+    private ArrayList<Appointment> appointments;
+    private String specialization;
+    public Doctor(String firstName, String lastName, String email, String phoneNumber, char gender, int age, String address, String specialization)
+    {
+        super(firstName, lastName, email, phoneNumber, gender, age, address);
+        this.patients = new ArrayList<>();
+        this.appointments = new ArrayList<>();
+        this.specialization = specialization;
     }
 
-
-    //doctor gives prescription
-    public void givePrescription(int PatientID, String Prescription ) {
-        Prescription newPrescription = new Prescription(PatientID , this.getUserId(), Prescription);
-        PrescriptionDAO.insertPrescription(newPrescription);
+  
+    public void addPatient(Patient patient)
+    {
+        if (!patients.contains(patient))
+        {
+            patients.add(patient);
+        }
     }
 
-    //doctor wants to see requested appointments
-    public ArrayList<Appointment> doctorGetsRequestedAppointments() {
-        ArrayList<Appointment> requestedAppointments = AppointmentDAO.getPendingAppointmentsByDoctor(this.getEmail());
-        return requestedAppointments;
-    }
-    //doctor wants to approve appointment
-    public void acceptAppointment(int AppointmentID) {
-        AppointmentDAO.approveAppointment(AppointmentID);
-    }
-    //doctor wants to see approved appointments
-    public ArrayList<Appointment> doctorGetsApprovedAppointments() {
-        ArrayList<Appointment> approvedAppointments = AppointmentDAO.getApprovedAppointmentsByDoctor(this.getEmail());
-        return approvedAppointments;
+    public ArrayList<Patient> getPatients()
+    {
+        return patients;
     }
 
-    /// /////////////////////////////////video calls//////////////////////////////////////////
-    //Dotor wants to see requested video calls
-    public ArrayList<VideoCall> doctorGetsRequestedVideoCalls() {
-         ArrayList<VideoCall> requestedVideoCall =  VideocallDAO.getPendingVideoCalls(this.getEmail());
-         return requestedVideoCall;
+    // Displaying patient vitals
+    public void viewPatientVitals(Patient patient)
+    {
+        if(patient.getVitals().getVitals().isEmpty())
+        {
+            System.out.println("No vitals found for the patient. Please add vitals first.");
+        }
+        else
+        {
+            System.out.println("Vitals of the patient:  " + patient.getfirstName() + " " + patient.getlastName() + " :");
+            for (VitalSign vital : patient.getVitals().getVitals())
+            {
+                System.out.println(vital);
+                System.out.println("=============================");
+            }
+        }
     }
-    //doctor wants to Accept video call and give link
-    public void acceptVideoCall(int VideoCallID , String VideoCallLink) {
-        VideocallDAO.approveVideoCall(VideoCallID);
-        VideocallDAO.addVideoLink(VideoCallID, VideoCallLink);
-
-    }
-
-    /// ////////////////////////SIGN IN AND SIGN OUT //////////////////////////
-    public Doctor GetDoctorInstanceAndValidatePassword(String Email,String password) {
-            Doctor newDoctor = AdminDAO.authenticateDoctor(Email, password);
-            return newDoctor;
-    }
-
-    public Doctor SignUpDoctor( int doctorID, String doctorName, String email, String password) {
-        Doctor newDoctor = new Doctor(doctorID , doctorName, email, password);
-        AdminDAO.insertDoctor(newDoctor);
-        return newDoctor;
+    public String getspecialization()
+    {
+        return specialization;
     }
 
+    //  patient feedback
+    public void giveFeedback(Patient patient, String feedbackContent, Prescription prescription)
+    {
+        Feedback temp = new Feedback(this.getfirstName() + " " + this.getlastName(), feedbackContent, prescription);
+        patient.getMedicalHistory().addFeedback(temp);
+    }
 
+    
+    public void addAppointment(Appointment appointment)
+    {
+        if (!appointments.contains(appointment))
+        {
+            appointments.add(appointment);
+        }
+    }
+    public ArrayList<Appointment> getAppointments()
+    {
+        return appointments;
+    }
 
 }

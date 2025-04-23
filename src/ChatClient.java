@@ -1,13 +1,15 @@
 public class ChatClient {
-    private String username;
+    private String name;
     private ChatServer server;
 
-    public ChatClient(String username, ChatServer server) {
-        this.username = username;
+    public ChatClient(String name, ChatServer server)
+    {
+        this.name = name;
         this.server = server;
     }
 
-    public void sendMessage(String to, String message) {
-        server.sendMessage(username, to, message);
+    public void sendMessage(String message)
+    {
+        server.receiveMessage(name, message);
     }
 }
