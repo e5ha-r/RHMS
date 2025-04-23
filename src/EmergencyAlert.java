@@ -2,7 +2,7 @@ public class EmergencyAlert {
 
     private NotificationService notificationService;
 
-    // Instance Variables to Define Thresholds:
+  
     private final double MAX_HEART_RATE = 120;
     private final double MAX_TEMP = 39.0;
     private final double MIN_OXYGEN = 90;
