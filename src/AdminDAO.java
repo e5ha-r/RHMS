@@ -1,6 +1,7 @@
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class AdminDAO {
@@ -31,6 +32,36 @@ public class AdminDAO {
         }
         return false;
     }
+
+
+
+
+
+
+
+    //method to add a new doctor
+    public static boolean insertDoctor(Doctor doctor) {
+        String query = "INSERT INTO Doctor (doctor_ID, name, email, password) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = DataBaseConnector.connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, doctor.getUserId());
+            stmt.setString(2, doctor.getUsername());
+            stmt.setString(3, doctor.getEmail());
+            stmt.setString(4, doctor.getPassword());
+
+            int rowsInserted = stmt.executeUpdate();
+            return rowsInserted > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+
 
 
     //method to delete a patient
@@ -109,6 +140,35 @@ public class AdminDAO {
         }
         return null; // If credentials don't match or error occurs
     }
+    //method for signing in of doctor
+    public static Doctor authenticateDoctor(String email, String password) {
+        String query = "SELECT * FROM Doctor WHERE email = ?";
+
+        try (Connection conn = DataBaseConnector.connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String dbPassword = rs.getString("password");
+                if (dbPassword.equals(password)) {
+                    int doctorID = rs.getInt("doctor_ID");
+                    String doctorName = rs.getString("name");
+
+                    return new Doctor(doctorID, doctorName, email, password);
+                } else {
+                    System.out.println("Invalid Password");
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null; // If credentials don't match or error occurs
+    }
+
 
     //seeall patients
     public static ArrayList<Patient> getAllPatients() {
@@ -177,6 +237,53 @@ public class AdminDAO {
 
         return patients;
     }
+    //Admin SignIn
+    public static Admin authenticateAdmin(String email, String password) {
+        String query = "SELECT * FROM Admin WHERE email = ?";
 
+        try (Connection conn = DataBaseConnector.connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String dbPassword = rs.getString("password");
+                if (dbPassword.equals(password)) {
+                    int adminId = rs.getInt("admin_ID");
+                    String name = rs.getString("name");
+                    return new Admin(adminId, name, email, dbPassword);
+                } else {
+                    System.out.println("Invalid password.");
+                }
+            } else {
+                System.out.println("Admin not found.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Signup
+    public static boolean insertAdmin(Admin admin) {
+        String query = "INSERT INTO Admin (name, email, password) VALUES (?, ?, ?)";
+
+        try (Connection conn = DataBaseConnector.connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, admin.getUsername());
+            stmt.setString(2, admin.getEmail());
+            stmt.setString(3, admin.getPassword());
+
+            int rowsInserted = stmt.executeUpdate();
+            return rowsInserted > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }
